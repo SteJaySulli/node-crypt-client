@@ -1,0 +1,22 @@
+{
+  "name": "my-forms-crypt",
+  "version": "1.0.0",
+  "description": "Promise based hybrid strong encryption using node's crypto module.",
+  "main": "dist/crypt-client.js",
+  "scripts": {
+    "test": "npm run build && node dist/test.js",
+    "build": "babel src/crypt-client.js -d dist && babel src/test.js -d dist"
+  },
+  "keywords": [
+    "crypto",
+    "cryptography",
+    "my-forms.net"
+  ],
+  "author": "Stephen J Sullivan",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "@babel/cli": "^7.11.5",
+    "@babel/core": "^7.11.5",
+    "@babel/preset-env": "^7.11.5"
+  }
+}
