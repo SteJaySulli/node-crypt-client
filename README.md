@@ -133,7 +133,8 @@ We can also do the same when decrypting; lets assume we already have `encryptedK
 ```javascript
 CryptClient.init(
   'my.keyfile', 
-  () => getpassphrase("Enter your key file passphrase: ")
+  () => getpassphrase("Enter your key file passphrase: "),
+  () => getpassphrase("Enter your private key passphrase: ")
 ).then( client => {
   client.decrypt(
     encryptedKey, 
@@ -149,6 +150,8 @@ CryptClient.init(
 });
 ```
 
-Note that this example does not include a *private key passphrase* in the call to `CryptClient.init` because we don't expect to need it; if we are trying to decrypt data then the key pair must already exist, so the parameter won't be used anyway.
+Note that while we have provided the *private key passphrase* in our call to CryptClient.init, this will only be used if the key file does not exist, and as we are decrypting data it makes no sense unless that key file already exists, so we could actually omit this parameter for this example. 
 
 You can, however, see that the passphrase will be requested to decrypt the data. If a private key passphrase wasn't set when the keys were generated this won't be used, as the passphrase is already known from the key file. If a passphrase is needed, however, the user will be required to enter it.
+
+
