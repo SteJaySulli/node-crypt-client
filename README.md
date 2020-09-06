@@ -66,3 +66,11 @@ CryptClient.init('my.keyfile', keyFilePassphrase, privateKeyPassphrase).then( cl
   }).catch(err => console.warn("%o\nEncryption failed", err));
 }).catch( err => console.warn("%o\nFailed to initialise CryptClient", err));
 ```
+
+Lets deconstruct this example. First we call `CryptClient.init` providing a filename (in which our encrypted keys are stored) along with the *key file passphrase* and the *private key passphrase*. The first time this is called, a public and private key will be generated using these passphrases and it will be stored in the given filename ('my.keyfile' in this case). Subsequent calls will instead *load* the given keyfile and decrypt it with the *key file passphrase*. The promise is resolved, providing an instance of the `CryptClient` class (`client`).
+
+It's worth noting that we have hard-coded the passphrases and the data to be encrypted in this example, but of course these details would not normally be a part of the code; in particular the passphrases would be entered by the user rather than being stored anywhere - we can actually provide functions rather than strings as the passphrase parameters to aid retrieving them from the user, but more on that later.
+
+Next we encrypt some data using `client.encrypt`. This resolves the promise providing the encrypted data key and the encrypted data; at this point we would ordinarily store both of these together in a database record.
+
+Next we decrypt the data again using `client.decrypt`. Note that the *private key passphrase* is required if one is set; if no *private key passphrase* was given when the keys were generated, a random one is generated and stored along with the keys, so you can omit the *private key passphrase* although it is recommended that you provide one.
