@@ -81,4 +81,70 @@ Finally for the purposes of this example, we simply compare the data to encrypt 
 
 As mentioned above, we can provide a function instead of strings for the passphrase arguments. In this case the function should return a promise so that we can keep the operations asynchronous while the user enters their passphrase.
 
-:exclamation: TODO - Please check back soon for an example of this
+The following function is used by the tests in `src/test.js` to obtain a password from the console:
+
+```javascript
+function getpassphrase(prompt = "Enter your passphrase: ") {
+    return new Promise((resolve, reject) => {
+        // Adapted from https://stackoverflow.com/a/59727173/2946845
+        var readline = require("readline"),
+            rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.input.on("keypress", (c, k) => {
+        // get the number of characters entered so far:
+        var len = rl.line.length;
+        // move cursor back to the beginning of the input:
+        readline.moveCursor(rl.output, -len, 0);
+        // clear everything to the right of the cursor:
+        readline.clearLine(rl.output, 1);
+        // replace the original input with asterisks:
+        for (var i = 0; i < len; i++) {
+            rl.output.write("*");
+        }
+        });
+        rl.question(prompt, pw => {
+            resolve(pw);
+            rl.close();
+        });
+    });
+}
+```
+
+We can provide this function as parameters when we initialise `CryptClient`:
+
+```javascript
+CryptClient.init(
+  'my.keyfile', 
+  () => getpassphrase("Enter your key file passphrase: "),
+  () => getpassphrase("Enter your private key passphrase: ")
+).then( client => {
+  // We can now use client to encrypt or decrypt data
+}).catch( err => {
+  // Something went wrong, possibly an incorrect passphrase - err contains the actual error/exception that occured
+});
+```
+
+The above code will always request a key file passphrase, as this is needed to create a new key pair or decrypt an existing one. The private key passphrase will only be requested if we are generating a new key pair, as decrypting an existing key pair does not require a private key passphrase.
+
+We can also do the same when decrypting; lets assume we already have `encryptedKey` and `encryptedData` to decrypt:
+
+```javascript
+CryptClient.init(
+  'my.keyfile', 
+  () => getpassphrase("Enter your key file passphrase: ")
+).then( client => {
+  client.decrypt(encryptedKey, encryptedData, () => getpassphrase("Enter your private key passphrase: ")).then( decryptedData => {
+    // We now have the decryptedData
+  }).catch( err => {
+    // Something went wrong during decryption, possibly an incorrect passphrase - err contains the actual error/exception that occured
+  });
+}).catch( err => {
+  // Something went wrong during initialisation, possibly an incorrect passphrase - err contains the actual error/exception that occured
+});
+```
+
+Note that this example does not include a *private key passphrase* in the call to `CryptClient.init` because we don't expect to need it; if we are trying to decrypt data then the key pair must already exist, so the parameter won't be used anyway.
+
+You can, however, see that the passphrase will be requested to decrypt the data. If a private key passphrase wasn't set when the keys were generated this won't be used, as the passphrase is already known from the key file. If a passphrase is needed, however, the user will be required to enter it.
