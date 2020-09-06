@@ -135,7 +135,11 @@ CryptClient.init(
   'my.keyfile', 
   () => getpassphrase("Enter your key file passphrase: ")
 ).then( client => {
-  client.decrypt(encryptedKey, encryptedData, () => getpassphrase("Enter your private key passphrase: ")).then( decryptedData => {
+  client.decrypt(
+    encryptedKey, 
+    encryptedData, 
+    () => getpassphrase("Enter your private key passphrase: ")
+  ).then( decryptedData => {
     // We now have the decryptedData
   }).catch( err => {
     // Something went wrong during decryption, possibly an incorrect passphrase - err contains the actual error/exception that occured
