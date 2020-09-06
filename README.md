@@ -74,3 +74,11 @@ It's worth noting that we have hard-coded the passphrases and the data to be enc
 Next we encrypt some data using `client.encrypt`. This resolves the promise providing the encrypted data key and the encrypted data; at this point we would ordinarily store both of these together in a database record.
 
 Next we decrypt the data again using `client.decrypt`. Note that the *private key passphrase* is required if one is set; if no *private key passphrase* was given when the keys were generated, a random one is generated and stored along with the keys, so you can omit the *private key passphrase* although it is recommended that you provide one.
+
+Finally for the purposes of this example, we simply compare the data to encrypt with the decrypted data. Note that any data is automatically cast to a `Buffer`, so we should expect that the decrypted data will be a buffer even if we passed in a string; this is why we explicitly cast the data to be encrypted to a buffer then back to a string for this test; this ensures we are dealing with strings with the same `utf8` encoding for the comparison.
+
+## Requesting passphrases from the user
+
+As mentioned above, we can provide a function instead of strings for the passphrase arguments. In this case the function should return a promise so that we can keep the operations asynchronous while the user enters their passphrase.
+
+:exclamation: TODO - Please check back soon for an example of this
