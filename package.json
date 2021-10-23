@@ -1,6 +1,6 @@
 {
-  "name": "my-forms-crypt",
-  "version": "1.2.0",
+  "name": "node-crypt-client",
+  "version": "1.2.1",
   "description": "Promise based hybrid strong encryption using node's crypto module.",
   "main": "dist/crypt-client.js",
   "scripts": {
