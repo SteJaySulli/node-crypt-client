@@ -1,4 +1,4 @@
-import crypto, { Decipher } from 'crypto';
+import crypto from 'crypto';
 import fs from 'fs';
 
 export default class CryptClient {
@@ -6,7 +6,20 @@ export default class CryptClient {
         this.keyFileName = keyFileName
     }
 
-
+    /**
+     * init
+     * 
+     * Initialise & instantiate a new instance of this class, using the given keyFile
+     * and passphrases.
+     * 
+     * On success, the returned promise is resolved with the instance of CryptClient,
+     * otherwise the promise is rejected  with the error details
+     * 
+     * @param {string} keyFile 
+     * @param {string} keyFilePassphrase 
+     * @param {string} privateKeyPassphrase 
+     * @returns {Promise}
+     */
     static init(keyFile, keyFilePassphrase, privateKeyPassphrase = null) {
         return new Promise(
             (resolve, reject) => {
@@ -52,7 +65,7 @@ export default class CryptClient {
      * On failure, the promise is rejected with the error details.
      * 
      * @param {string} privateKeyPassphrase 
-     * @returns Promise
+     * @returns {Promise}
      */
     static generateKeys(privateKeyPassphrase) {
         return new Promise((resolve,reject) => {
@@ -96,7 +109,7 @@ export default class CryptClient {
      * 
      * @param {object} keys 
      * @param {string} keyFilePassphrase 
-     * @returns Promise
+     * @returns {Promise}
      */
     static encryptKeys(keys, keyFilePassphrase) {
         return new Promise( (resolve, reject) => {
@@ -128,6 +141,7 @@ export default class CryptClient {
      * 
      * @param {Buffer|string} encryptedKeys 
      * @param {string} keyFilePassphrase 
+     * @returns {Promise}
      */
     static decryptKeys(encryptedKeys, keyFilePassphrase) {
         return new Promise( (resolve, reject) => {
@@ -155,7 +169,7 @@ export default class CryptClient {
      * @param {object} keys 
      * @param {string} keyFilePassphrase
      * @param {string} keyFileName 
-     * @returns Promise
+     * @returns {Promise}
      */
     static saveKeys(keys, keyFilePassphrase, keyFileName) {
         return new Promise( (resolve, reject) => {
@@ -167,7 +181,7 @@ export default class CryptClient {
                         resolve( keyFileName );
                     }
                 });
-            });
+            }).catch( err => reject(err));
         });
     }
 
@@ -181,7 +195,7 @@ export default class CryptClient {
      * 
      * @param {*} keyFileName 
      * @param {*} keyFilePassphrase 
-     * @returns Promise
+     * @returns {Promise}
      */
     static loadKeys(keyFileName, keyFilePassphrase) {
         return new Promise( (resolve, reject) => {
@@ -197,6 +211,17 @@ export default class CryptClient {
         });
     }
 
+    /**
+     * setKeyFile
+     * 
+     * This method is used internally to save the current set of keys. This is a
+     * wrapper around saveKeys above to use the instance's stored keyset and filename;
+     * in normal usage you will not need to call this manually as this is called during
+     * init.
+     * 
+     * @param {string} keyFilePassphrase 
+     * @returns {Promise}
+     */
     setKeyFile(keyFilePassphrase) {
         return new Promise( (resolve, reject) => {
             CryptClient.saveKeys(this.keys, keyFilePassphrase, this.keyFileName)
@@ -205,6 +230,16 @@ export default class CryptClient {
         });
     }
 
+    /**
+     * getKeyFile
+     * 
+     * This method is used internally to read the current set of keys. This is a wrapper
+     * around loadKeys above to use the instance's stored keyfile; in normal usage you will
+     * not need to call this manually as this is called during init.
+     * 
+     * @param {string} keyFilePassphrase 
+     * @returns {Promise}
+     */
     getKeyFile(keyFilePassphrase) {
         return new Promise( (resolve, reject) => {
             CryptClient.loadKeys(this.keyFileName, keyFilePassphrase)
@@ -216,6 +251,12 @@ export default class CryptClient {
         });
     }
 
+    /**
+     * getPublicKey
+     * 
+     * Returns the public key which can be used to encrypt data
+     * @returns {string}
+     */
     getPublicKey() {
         return this.keys.publicKey;
     }
