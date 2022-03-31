@@ -5,20 +5,31 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _crypto = _interopRequireWildcard(require("crypto"));
+var _crypto = _interopRequireDefault(require("crypto"));
 
 var _fs = _interopRequireDefault(require("fs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
 class CryptClient {
   constructor(keyFileName) {
     this.keyFileName = keyFileName;
   }
+  /**
+   * init
+   * 
+   * Initialise & instantiate a new instance of this class, using the given keyFile
+   * and passphrases.
+   * 
+   * On success, the returned promise is resolved with the instance of CryptClient,
+   * otherwise the promise is rejected  with the error details
+   * 
+   * @param {string} keyFile 
+   * @param {string} keyFilePassphrase 
+   * @param {string} privateKeyPassphrase 
+   * @returns {Promise}
+   */
+
 
   static init(keyFile, keyFilePassphrase, privateKeyPassphrase = null) {
     return new Promise((resolve, reject) => {
@@ -60,7 +71,7 @@ class CryptClient {
    * On failure, the promise is rejected with the error details.
    * 
    * @param {string} privateKeyPassphrase 
-   * @returns Promise
+   * @returns {Promise}
    */
 
 
@@ -109,7 +120,7 @@ class CryptClient {
    * 
    * @param {object} keys 
    * @param {string} keyFilePassphrase 
-   * @returns Promise
+   * @returns {Promise}
    */
 
 
@@ -145,6 +156,7 @@ class CryptClient {
    * 
    * @param {Buffer|string} encryptedKeys 
    * @param {string} keyFilePassphrase 
+   * @returns {Promise}
    */
 
 
@@ -176,7 +188,7 @@ class CryptClient {
    * @param {object} keys 
    * @param {string} keyFilePassphrase
    * @param {string} keyFileName 
-   * @returns Promise
+   * @returns {Promise}
    */
 
 
@@ -190,7 +202,7 @@ class CryptClient {
             resolve(keyFileName);
           }
         });
-      });
+      }).catch(err => reject(err));
     });
   }
   /**
@@ -203,7 +215,7 @@ class CryptClient {
    * 
    * @param {*} keyFileName 
    * @param {*} keyFilePassphrase 
-   * @returns Promise
+   * @returns {Promise}
    */
 
 
@@ -220,12 +232,35 @@ class CryptClient {
       });
     });
   }
+  /**
+   * setKeyFile
+   * 
+   * This method is used internally to save the current set of keys. This is a
+   * wrapper around saveKeys above to use the instance's stored keyset and filename;
+   * in normal usage you will not need to call this manually as this is called during
+   * init.
+   * 
+   * @param {string} keyFilePassphrase 
+   * @returns {Promise}
+   */
+
 
   setKeyFile(keyFilePassphrase) {
     return new Promise((resolve, reject) => {
       CryptClient.saveKeys(this.keys, keyFilePassphrase, this.keyFileName).then(filename => resolve(filename)).catch(err => reject(err));
     });
   }
+  /**
+   * getKeyFile
+   * 
+   * This method is used internally to read the current set of keys. This is a wrapper
+   * around loadKeys above to use the instance's stored keyfile; in normal usage you will
+   * not need to call this manually as this is called during init.
+   * 
+   * @param {string} keyFilePassphrase 
+   * @returns {Promise}
+   */
+
 
   getKeyFile(keyFilePassphrase) {
     return new Promise((resolve, reject) => {
@@ -235,6 +270,13 @@ class CryptClient {
       }).catch(err => reject(err));
     });
   }
+  /**
+   * getPublicKey
+   * 
+   * Returns the public key which can be used to encrypt data
+   * @returns {string}
+   */
+
 
   getPublicKey() {
     return this.keys.publicKey;
